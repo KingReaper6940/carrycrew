@@ -1,0 +1,8 @@
+export const example={schema:'carrycrew-project-v1',title:'Weekend crew · example weights',people:[{id:'p1',name:'Ari'},{id:'p2',name:'Sam'},{id:'p3',name:'Jo'}],items:[
+ {id:'i1',name:'Tent bundle',kind:'shared',unitMg:2300000,qty:1,carrier:'p2',packed:true},
+ {id:'i2',name:'Cook kit',kind:'shared',unitMg:500000,qty:1,carrier:'p1',packed:false},
+ {id:'i3',name:'Filter',kind:'shared',unitMg:100000,qty:1,carrier:null,packed:false},
+ {id:'i4',name:'Repair pouch',kind:'shared',unitMg:300000,qty:1,carrier:null,packed:false},
+ {id:'i5',name:'Snack portions',kind:'shared',unitMg:250000,qty:4,carrier:null,packed:false},
+ {id:'i6',name:'Jo’s personal bag',kind:'personal',unitMg:1200000,qty:1,carrier:'p3',packed:true}
+]};
