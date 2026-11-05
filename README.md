@@ -1,5 +1,7 @@
 # Carrycrew
 
+[Open Carrycrew](https://carrycrew.vercel.app)
+
 A browser-local packing desk for people travelling together. Put personal and shared gear in one plan, assign a carrier to each bundle, compare entered weights and mark whole bundles packed.
 
 ![Generated example load chart](examples/loads.svg)
