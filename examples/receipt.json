@@ -1,0 +1,105 @@
+{
+  "schema": "carrycrew-receipt-v1",
+  "title": "Weekend crew · example weights",
+  "people": [
+    {
+      "id": "p1",
+      "name": "Ari",
+      "mg": 1600000,
+      "packedMg": 0,
+      "bundles": 3,
+      "packedBundles": 0
+    },
+    {
+      "id": "p2",
+      "name": "Sam",
+      "mg": 2300000,
+      "packedMg": 2300000,
+      "bundles": 1,
+      "packedBundles": 1
+    },
+    {
+      "id": "p3",
+      "name": "Jo",
+      "mg": 1500000,
+      "packedMg": 1200000,
+      "bundles": 2,
+      "packedBundles": 1
+    }
+  ],
+  "totalMg": 5400000,
+  "packedMg": 3500000,
+  "packedBundles": 2,
+  "totalBundles": 6,
+  "unassignedMg": 0,
+  "unassignedBundles": 0,
+  "unassignedPersonal": 0,
+  "items": [
+    {
+      "id": "i1",
+      "name": "Tent bundle",
+      "kind": "shared",
+      "unitMg": 2300000,
+      "qty": 1,
+      "carrier": "p2",
+      "packed": true,
+      "carrierName": "Sam",
+      "totalMg": 2300000
+    },
+    {
+      "id": "i2",
+      "name": "Cook kit",
+      "kind": "shared",
+      "unitMg": 500000,
+      "qty": 1,
+      "carrier": "p1",
+      "packed": false,
+      "carrierName": "Ari",
+      "totalMg": 500000
+    },
+    {
+      "id": "i3",
+      "name": "Filter",
+      "kind": "shared",
+      "unitMg": 100000,
+      "qty": 1,
+      "carrier": "p1",
+      "packed": false,
+      "carrierName": "Ari",
+      "totalMg": 100000
+    },
+    {
+      "id": "i4",
+      "name": "Repair pouch",
+      "kind": "shared",
+      "unitMg": 300000,
+      "qty": 1,
+      "carrier": "p3",
+      "packed": false,
+      "carrierName": "Jo",
+      "totalMg": 300000
+    },
+    {
+      "id": "i5",
+      "name": "Snack portions",
+      "kind": "shared",
+      "unitMg": 250000,
+      "qty": 4,
+      "carrier": "p1",
+      "packed": false,
+      "carrierName": "Ari",
+      "totalMg": 1000000
+    },
+    {
+      "id": "i6",
+      "name": "Jo’s personal bag",
+      "kind": "personal",
+      "unitMg": 1200000,
+      "qty": 1,
+      "carrier": "p3",
+      "packed": true,
+      "carrierName": "Jo",
+      "totalMg": 1200000
+    }
+  ]
+}
