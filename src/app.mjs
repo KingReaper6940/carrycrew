@@ -1,4 +1,5 @@
 import {History} from './edit.mjs';import {example} from './example.mjs';import {audit,gramsInput,gramsText,quantityInput,clone,mass} from './model.mjs';import {suggest,applySuggestion} from './suggest.mjs';import {report,chartSvg,checklistHtml} from './export.mjs';
+import {attachFiles} from './handoff.mjs';
 export function mount(doc,env={}){
  const $=id=>doc.getElementById(id),h=new History(example),api=env.URL??globalThis.URL,urls=new Map();
  let editing=null,draft=false,revision=0,proposal=null;
@@ -40,7 +41,7 @@ export function mount(doc,env={}){
  for(const [id,value,type] of [['project',JSON.stringify(b,null,2)+'\n','application/json'],['receipt',JSON.stringify(report(b),null,2)+'\n','application/json'],['chart',chartSvg(b),'image/svg+xml'],['html',checklistHtml(b),'text/html']]){const url=api.createObjectURL(new Blob([value],{type}));urls.set(id,url);$(id).setAttribute('href',url);}
  }
  const clean=()=>{if(!draft)return true;say('Save or clear the item draft before changing other board data.',true);return false;};
- function apply(action,message){try{if(h.apply(action))revision++;proposal=null;render();say(message);return true;}catch(e){say(e.message,true);return false;}}
+ function apply(action,message){const focused=doc.activeElement,focusId=focused?.dataset?.id,focusAction=focused?.dataset?.action;try{if(h.apply(action))revision++;proposal=null;render();if(focusId)doc.querySelector(focused.tagName+'[data-id="'+focusId+'"]'+(focusAction?'[data-action="'+focusAction+'"]':''))?.focus();say(message);return true;}catch(e){say(e.message,true);return false;}}
  $('item-form').addEventListener('submit',e=>{e.preventDefault();try{const action={type:editing?'itemUpdate':'itemAdd',id:editing,name:$('item-name').value,kind:$('kind').value,unitMg:gramsInput($('weight').value),qty:quantityInput($('qty').value),carrier:$('owner').value==='none'?null:$('owner').value,packed:$('item-packed').checked};const was=draft;draft=false;if(!apply(action,'Bundle saved. Quantities and weights are counted in full.'))draft=was;render();}catch(error){say(error.message,true);}});
  for(const id of ['item-name','weight','qty','kind','owner','item-packed'])$(id).addEventListener(['kind','owner','item-packed'].includes(id)?'change':'input',()=>{draft=true;revision++;proposal=null;proposalView();$('draft').textContent='Unapplied item draft. Save or clear it before other edits.';});
  $('cancel-edit').addEventListener('click',()=>{editing=null;draft=false;revision++;proposal=null;render();say('Item editor cleared.');});
@@ -58,6 +59,7 @@ export function mount(doc,env={}){
  function load(board){h.replace(clone(board));editing=null;draft=false;proposal=null;revision++;$('query').value='';$('filter-state').value='all';render();say('Project loaded. Previous applied plan is available with Undo.');}
  $('demo').addEventListener('click',()=>load(example));
  $('copy').addEventListener('click',async()=>{try{await (env.clipboard??globalThis.navigator.clipboard).writeText(JSON.stringify(report(h.current),null,2)+'\n');say('Complete receipt copied.');}catch{say('Clipboard unavailable. Download the receipt instead.',true);}});
- render();return {history:h,load,say,get revision(){return revision;},dispose(){for(const u of urls.values())api.revokeObjectURL(u);urls.clear();}};
+ render();const app={history:h,load,say,get revision(){return revision;},dispose(){for(const u of urls.values())api.revokeObjectURL(u);urls.clear();}};
+ attachFiles(doc,app);return app;
 }
 if(typeof document!=='undefined')mount(document);
