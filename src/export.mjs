@@ -1,0 +1,18 @@
+import {validate,audit,mass,gramsText} from './model.mjs';
+export const escape=s=>s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+export function report(board){validate(board);const a=audit(board);return {schema:'carrycrew-receipt-v1',title:board.title,...a,items:board.items.map(i=>({...i,carrierName:board.people.find(p=>p.id===i.carrier)?.name??null,totalMg:mass(i)}))};}
+function wrap(s,n){const chars=[...s],out=[];for(let i=0;i<chars.length;i+=n)out.push(chars.slice(i,i+n).join(''));return out.length?out:[''];}
+export function chartSvg(board){
+ const a=audit(board),rows=[...a.people.map(p=>({name:p.name,mg:p.mg,packedMg:p.packedMg})),{name:'Unassigned',mg:a.unassignedMg,packedMg:board.items.filter(i=>i.carrier===null&&i.packed).reduce((n,i)=>n+mass(i),0)}],title=wrap(board.title,28),top=title.length*28+75,height=top+rows.length*74+45,max=Math.max(1,...rows.map(p=>p.mg));
+ const out=['<svg xmlns="http://www.w3.org/2000/svg" width="760" height="'+height+'" viewBox="0 0 760 '+height+'" role="img" aria-labelledby="title desc"><title id="title">'+escape(board.title)+'</title><desc id="desc">Entered bundle weights per carrier, with unassigned mass separate. Dark bars are packed mass; full bars are total mass.</desc><rect width="760" height="'+height+'" fill="#f6f4eb"/>'];
+ title.forEach((s,i)=>out.push('<text x="24" y="'+(37+i*28)+'" font-family="sans-serif" font-size="24" fill="#253f39">'+escape(s)+'</text>'));
+ out.push('<text x="24" y="'+(top-23)+'" font-family="sans-serif" font-size="12" fill="#5b7067">Entered weights only · dark portion packed · all bundles included</text>');
+ rows.forEach((p,i)=>{const y=top+i*74;wrap(p.name,12).forEach((s,k)=>out.push('<text x="24" y="'+(y+18+k*14)+'" font-family="sans-serif" font-size="12" fill="#253f39">'+escape(s)+'</text>'));
+ out.push('<rect x="190" y="'+y+'" width="'+(p.mg/max*390)+'" height="25" rx="4" fill="#d7debd"/><rect x="190" y="'+y+'" width="'+(p.packedMg/max*390)+'" height="25" rx="4" fill="#3c6d55"/><text x="736" y="'+(y+18)+'" text-anchor="end" font-family="monospace" font-size="12" fill="#253f39">'+gramsText(p.mg)+' g</text>');});
+ out.push('</svg>');return out.join('');
+}
+export function checklistHtml(board){
+ validate(board);const a=audit(board),groups=[...board.people,{id:null,name:'Unassigned'}];
+ const body=groups.map(p=>'<section><h2>'+escape(p.name)+'</h2><table><thead><tr><th>Packed</th><th>Bundle</th><th>Kind</th><th>Qty</th><th>Each (g)</th><th>Total (g)</th></tr></thead><tbody>'+board.items.filter(i=>i.carrier===p.id).map(i=>'<tr><td>'+(i.packed?'[x]':'[ ]')+'</td><td>'+escape(i.name)+'</td><td>'+i.kind+'</td><td>'+i.qty+'</td><td>'+gramsText(i.unitMg)+'</td><td>'+gramsText(mass(i))+'</td></tr>').join('')+'</tbody></table></section>').join('');
+ return '<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+escape(board.title)+'</title><style>body{font:15px/1.6 system-ui,sans-serif;max-width:1000px;margin:30px auto;padding:0 20px;color:#253f39}table{border-collapse:collapse;width:100%}th,td{border-bottom:1px solid #ccd4c8;padding:8px;text-align:left;overflow-wrap:anywhere}section{margin:30px 0;break-inside:avoid}th{font-size:12px}@media print{body{margin:0;font-size:11px}section{break-before:page}section:first-of-type{break-before:auto}}</style><h1>'+escape(board.title)+'</h1><p>Total '+gramsText(a.totalMg)+' g · '+a.packedBundles+'/'+a.totalBundles+' bundles packed · '+gramsText(a.unassignedMg)+' g unassigned.</p><p>Entered weights and whole-bundle assignments only. Keep the JSON project to resume editing.</p>'+body+'</html>';
+}
